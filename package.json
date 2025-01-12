@@ -24,11 +24,12 @@
     "dist"
   ],
   "scripts": {
-    "build": "strapi-plugin build",
+    "build": "strapi-plugin build && pnpm build:copy",
+    "build:copy": "node -e \"require('fs').copyFileSync('./server/src/types.d.ts', './dist/server/types.d.ts')\"",
     "watch": "strapi-plugin watch",
     "watch:link": "strapi-plugin watch:link",
     "verify": "strapi-plugin verify",
-    "test:ts:back": "run -T tsc -p server/tsconfig.json"
+    "test:ts:back": "tsc -p server/tsconfig.json"
   },
   "dependencies": {
     "node-fetch": "^3.3.2",

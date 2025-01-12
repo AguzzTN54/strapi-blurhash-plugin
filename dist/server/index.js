@@ -52,7 +52,11 @@ const beforeUpdateHandler = async (strapi, props) => {
   if (!(isImage && isNeedUpdate)) return;
   const targetURL = generateURL({ hash, host, port, url, mime });
   console.log(`regenerating blurhash for image: ${targetURL}`);
-  data.blurhash = await strapi.plugin(pluginName).service("blurGenerator").generateBlurhash(targetURL);
+  const opt = {
+    flatten: strapi.plugin(pluginName).config("flatten"),
+    flattenColor: strapi.plugin(pluginName).config("flattenColor")
+  };
+  data.blurhash = await strapi.plugin(pluginName).service("blurGenerator").generateBlurhash(targetURL, opt);
   console.log(`blurhash regenerated successfully: ${data.blurhash}`);
 };
 const createHandler = async (strapi, props) => {
@@ -60,7 +64,11 @@ const createHandler = async (strapi, props) => {
   const { url, hash, mime } = data;
   const targetURL = generateURL({ hash, host, port, url, mime });
   console.log(`generating blurhash for image: ${targetURL}`);
-  data.blurhash = await strapi.plugin(pluginName).service("blurGenerator").generateBlurhash(targetURL);
+  const opt = {
+    flatten: strapi.plugin(pluginName).config("flatten"),
+    flattenColor: strapi.plugin(pluginName).config("flattenColor")
+  };
+  data.blurhash = await strapi.plugin(pluginName).service("blurGenerator").generateBlurhash(targetURL, opt);
   console.log(`blurhash generated successfully: ${data.blurhash}`);
 };
 const blurhashHandler = async (strapi, event, cycleType) => {
@@ -90,31 +98,61 @@ const register = ({ strapi }) => {
 const config = {
   default: {
     regenerateOnUpdate: false,
-    forceRegenerateOnUpdate: false
+    forceRegenerateOnUpdate: false,
+    flatten: false,
+    flattenColor: null
   },
   validator: (config2) => {
-    if (typeof config2.regenerateOnUpdate !== "boolean") {
+    const { flatten, flattenColor: bg, forceRegenerateOnUpdate, regenerateOnUpdate } = config2 || {};
+    if (typeof regenerateOnUpdate !== "boolean") {
       throw new Error("regenerateOnUpdate has to be a boolean");
     }
-    if (typeof config2.forceRegenerateOnUpdate !== "boolean") {
+    if (typeof forceRegenerateOnUpdate !== "boolean") {
       throw new Error("forceRegenerateOnUpdate has to be a boolean");
+    }
+    if (typeof flatten !== "boolean") {
+      throw new Error("flatten has to be a boolean");
+    }
+    if (flatten && bg) {
+      if (typeof bg === "object") {
+        if (!("r" in bg && "g" in bg && "b" in bg)) {
+          throw new Error("flattenColor should has 'r', 'g', & 'b' attributes");
+        }
+        if (typeof bg.r !== "number" || typeof bg.g !== "number" || typeof bg.b !== "number") {
+          throw new Error("flattenColor attributes should be number");
+        }
+        if (bg.r > 255 || bg.g > 255 || bg.b > 255 || bg.r < 0 || bg.g < 0 || bg.b < 0 || !Number.isInteger(bg.r) || !Number.isInteger(bg.g) || !Number.isInteger(bg.b)) {
+          throw new Error("flattenColor attributes should be integer between 0 - 255");
+        }
+      }
+      if (!((typeof bg).match(/(string|object|undefined)/) || bg === null)) {
+        throw new Error("flattenColor not a valid HEX or RGB Format");
+      }
     }
   }
 };
-const sharpProccessor = async (arrayBuffer) => {
+const getColor = (color) => {
+  if (typeof color === "undefined" || color === null) {
+    return { background: "white" };
+  }
+  return { background: color };
+};
+const sharpProccessor = async (arrayBuffer, opt) => {
   try {
-    const { data: pixels, info: metadata } = await sharp__default.default(arrayBuffer).ensureAlpha().resize(32, 32, { fit: "inside" }).raw().toBuffer({ resolveWithObject: true });
+    const preprocesss = sharp__default.default(arrayBuffer).ensureAlpha().resize(32, 32, { fit: "inside" });
+    const raw = !opt.flatten ? preprocesss.raw() : preprocesss.flatten(getColor(opt?.flattenColor)).raw();
+    const { data: pixels, info: metadata } = await raw.toBuffer({ resolveWithObject: true });
     return { pixels, metadata };
   } catch (error) {
     throw error;
   }
 };
-const encodeImageToBlurhash = async (url) => {
+const encodeImageToBlurhash = async (url, opt) => {
   try {
     const fetch = (await import("node-fetch")).default;
     const response = await fetch(url);
     const arrayBuffer = await response.arrayBuffer();
-    const { pixels, metadata } = await sharpProccessor(arrayBuffer);
+    const { pixels, metadata } = await sharpProccessor(arrayBuffer, opt);
     const { width, height } = metadata || {};
     const Thumbhash = await import("thumbhash");
     const blurBuffer = Thumbhash.rgbaToThumbHash(width, height, Buffer.from(pixels));
@@ -125,9 +163,9 @@ const encodeImageToBlurhash = async (url) => {
   }
 };
 const blurGenerator = ({ strapi }) => ({
-  async generateBlurhash(url) {
+  async generateBlurhash(url, opt = {}) {
     try {
-      const blurhash = await encodeImageToBlurhash(url);
+      const blurhash = await encodeImageToBlurhash(url, opt);
       return blurhash;
     } catch (error) {
       strapi.log.error(`Error generating blurhash: ${error.message}`);

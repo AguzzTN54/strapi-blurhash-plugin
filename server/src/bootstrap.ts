@@ -44,10 +44,15 @@ const beforeUpdateHandler = async (strapi: Core.Strapi, props: HandlerProps) => 
   const targetURL = generateURL({ hash, host, port, url, mime });
   console.log(`regenerating blurhash for image: ${targetURL}`);
 
+  const opt = {
+    flatten: strapi.plugin(pluginName).config('flatten'),
+    flattenColor: strapi.plugin(pluginName).config('flattenColor'),
+  };
+
   data.blurhash = await strapi
     .plugin(pluginName)
     .service('blurGenerator')
-    .generateBlurhash(targetURL);
+    .generateBlurhash(targetURL, opt);
   console.log(`blurhash regenerated successfully: ${data.blurhash}`);
 };
 
@@ -58,10 +63,15 @@ const createHandler = async (strapi: Core.Strapi, props: HandlerProps) => {
   const targetURL = generateURL({ hash, host, port, url, mime });
   console.log(`generating blurhash for image: ${targetURL}`);
 
+  const opt = {
+    flatten: strapi.plugin(pluginName).config('flatten'),
+    flattenColor: strapi.plugin(pluginName).config('flattenColor'),
+  };
+
   data.blurhash = await strapi
     .plugin(pluginName)
     .service('blurGenerator')
-    .generateBlurhash(targetURL);
+    .generateBlurhash(targetURL, opt);
   console.log(`blurhash generated successfully: ${data.blurhash}`);
 };
 
