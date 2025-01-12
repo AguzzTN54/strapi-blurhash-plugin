@@ -1,0 +1,58 @@
+import type { Core } from '@strapi/strapi';
+import sharp from 'sharp';
+import fetch from 'node-fetch';
+
+interface SharpProccessorProps {
+  metadata: { width: number; height: number };
+  pixels: ArrayBuffer;
+}
+const sharpProccessor = async (arrayBuffer: ArrayBuffer): Promise<SharpProccessorProps> => {
+  try {
+    const { data: pixels, info: metadata } = await sharp(arrayBuffer)
+      // .toFormat('png')
+      .ensureAlpha()
+      .resize(32, 32, { fit: 'inside' })
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    return { pixels, metadata };
+  } catch (error) {
+    throw error;
+  }
+};
+
+const encodeImageToBlurhash = async (url) => {
+  try {
+    const response = await fetch(url);
+    const arrayBuffer = await response.arrayBuffer();
+    const { pixels, metadata } = await sharpProccessor(arrayBuffer);
+    const { width, height } = metadata || {};
+
+    const Thumbhash = await import('thumbhash');
+    const blurBuffer = Thumbhash.rgbaToThumbHash(width, height, Buffer.from(pixels));
+    const blurhash = Buffer.from(blurBuffer).toString('base64');
+    console.log(blurBuffer);
+    console.log(
+      'url: ',
+      Thumbhash.thumbHashToDataURL(
+        Uint8Array.from(Buffer.from(blurhash, 'base64').toString('binary'), (c) => c.charCodeAt(0))
+      )
+    );
+    return blurhash;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const blurhash = ({ strapi }: { strapi: Core.Strapi }) => ({
+  async generateBlurhash(url) {
+    try {
+      const blurhash = await encodeImageToBlurhash(url);
+      return blurhash;
+    } catch (error) {
+      strapi.log.error(`Error generating blurhash: ${error.message}`);
+      throw error;
+    }
+  },
+});
+
+export default blurhash;
