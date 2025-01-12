@@ -1,4 +1,5 @@
 import type { Core } from '@strapi/strapi';
+import type { RequestInfo } from 'node-fetch';
 import sharp from 'sharp';
 
 interface SharpProccessorProps {
@@ -18,7 +19,7 @@ const sharpProccessor = async (arrayBuffer: ArrayBuffer): Promise<SharpProccesso
   }
 };
 
-const encodeImageToBlurhash = async (url) => {
+const encodeImageToBlurhash = async (url: URL | RequestInfo): Promise<string> => {
   try {
     const fetch = (await import('node-fetch')).default;
     const response = await fetch(url);
@@ -36,7 +37,7 @@ const encodeImageToBlurhash = async (url) => {
 };
 
 const blurhash = ({ strapi }: { strapi: Core.Strapi }) => ({
-  async generateBlurhash(url) {
+  async generateBlurhash(url: string) {
     try {
       const blurhash = await encodeImageToBlurhash(url);
       return blurhash;
