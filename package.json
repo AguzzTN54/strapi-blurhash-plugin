@@ -44,7 +44,8 @@
   },
   "peerDependencies": {
     "@strapi/sdk-plugin": "^5.3.0",
-    "@strapi/strapi": "^5.6.0"
+    "@strapi/strapi": "^5.6.0",
+    "sharp": "^0.33.5"
   },
   "strapi": {
     "name": "strapi-blurhash-plugin",
