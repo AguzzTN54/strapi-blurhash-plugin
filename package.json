@@ -1,5 +1,5 @@
 {
-  "name": "strapi-blurhash-plugin",
+  "name": "@aguzztn54/strapi-blurhash-plugin",
   "version": "0.1.0",
   "description": "A Strapi Plugin to generate blurhash for each uploaded images",
   "keywords": [
