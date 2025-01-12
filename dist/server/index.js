@@ -22,10 +22,8 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   mod
 ));
 const sharp = require("sharp");
-const fetch = require("node-fetch");
 const _interopDefault = (e) => e && e.__esModule ? e : { default: e };
 const sharp__default = /* @__PURE__ */ _interopDefault(sharp);
-const fetch__default = /* @__PURE__ */ _interopDefault(fetch);
 const pluginName = "strapi-blurhash-plugin";
 const generateURL = ({ url, host, port, hash, mime }) => {
   const isHttp = url.startsWith("http");
@@ -115,7 +113,8 @@ const sharpProccessor = async (arrayBuffer) => {
 };
 const encodeImageToBlurhash = async (url) => {
   try {
-    const response = await fetch__default.default(url);
+    const fetch = (await import("node-fetch")).default;
+    const response = await fetch(url);
     const arrayBuffer = await response.arrayBuffer();
     const { pixels, metadata } = await sharpProccessor(arrayBuffer);
     const { width, height } = metadata || {};

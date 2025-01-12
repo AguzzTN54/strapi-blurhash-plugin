@@ -1,6 +1,5 @@
 import type { Core } from '@strapi/strapi';
 import sharp from 'sharp';
-import fetch from 'node-fetch';
 
 interface SharpProccessorProps {
   metadata: { width: number; height: number };
@@ -21,6 +20,7 @@ const sharpProccessor = async (arrayBuffer: ArrayBuffer): Promise<SharpProccesso
 
 const encodeImageToBlurhash = async (url) => {
   try {
+    const fetch = (await import('node-fetch')).default;
     const response = await fetch(url);
     const arrayBuffer = await response.arrayBuffer();
     const { pixels, metadata } = await sharpProccessor(arrayBuffer);

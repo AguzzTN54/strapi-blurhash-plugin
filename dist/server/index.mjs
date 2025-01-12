@@ -1,5 +1,4 @@
 import sharp from "sharp";
-import fetch from "node-fetch";
 const pluginName = "strapi-blurhash-plugin";
 const generateURL = ({ url, host, port, hash, mime }) => {
   const isHttp = url.startsWith("http");
@@ -89,6 +88,7 @@ const sharpProccessor = async (arrayBuffer) => {
 };
 const encodeImageToBlurhash = async (url) => {
   try {
+    const fetch = (await import("node-fetch")).default;
     const response = await fetch(url);
     const arrayBuffer = await response.arrayBuffer();
     const { pixels, metadata } = await sharpProccessor(arrayBuffer);
