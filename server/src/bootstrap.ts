@@ -12,7 +12,8 @@ const pluginName = 'strapi-blurhash-plugin';
 const generateURL = ({ url, host, port, hash, mime }) => {
   const isHttp = url.startsWith('http');
   const mainImgURL = isHttp ? url : `${'http://' + host + ':' + port}${url}`;
-  const targetURL = mainImgURL.replace(hash, `thumbnail_${hash}`);
+  const isSVG = mime.match(/(svg|avif)/);
+  const targetURL = isSVG ? mainImgURL : mainImgURL.replace(hash, `thumbnail_${hash}`);
   return targetURL;
 };
 
