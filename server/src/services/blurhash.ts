@@ -9,7 +9,6 @@ interface SharpProccessorProps {
 const sharpProccessor = async (arrayBuffer: ArrayBuffer): Promise<SharpProccessorProps> => {
   try {
     const { data: pixels, info: metadata } = await sharp(arrayBuffer)
-      // .toFormat('png')
       .ensureAlpha()
       .resize(32, 32, { fit: 'inside' })
       .raw()
@@ -30,13 +29,6 @@ const encodeImageToBlurhash = async (url) => {
     const Thumbhash = await import('thumbhash');
     const blurBuffer = Thumbhash.rgbaToThumbHash(width, height, Buffer.from(pixels));
     const blurhash = Buffer.from(blurBuffer).toString('base64');
-    console.log(blurBuffer);
-    console.log(
-      'url: ',
-      Thumbhash.thumbHashToDataURL(
-        Uint8Array.from(Buffer.from(blurhash, 'base64').toString('binary'), (c) => c.charCodeAt(0))
-      )
-    );
     return blurhash;
   } catch (error) {
     throw error;
