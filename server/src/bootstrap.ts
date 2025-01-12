@@ -7,7 +7,7 @@ interface HandlerProps {
   port: number;
 }
 
-const pluginName = 'strapi-blurhash-plugin';
+const pluginName = 'blurhash';
 
 const generateURL = ({ url, host, port, hash, mime }) => {
   const isHttp = url.startsWith('http');
@@ -44,7 +44,10 @@ const beforeUpdateHandler = async (strapi: Core.Strapi, props: HandlerProps) => 
   const targetURL = generateURL({ hash, host, port, url, mime });
   console.log(`regenerating blurhash for image: ${targetURL}`);
 
-  data.blurhash = await strapi.plugin(pluginName).service('blurhash').generateBlurhash(targetURL);
+  data.blurhash = await strapi
+    .plugin(pluginName)
+    .service('blurGenerator')
+    .generateBlurhash(targetURL);
   console.log(`blurhash regenerated successfully: ${data.blurhash}`);
 };
 
@@ -55,7 +58,10 @@ const createHandler = async (strapi: Core.Strapi, props: HandlerProps) => {
   const targetURL = generateURL({ hash, host, port, url, mime });
   console.log(`generating blurhash for image: ${targetURL}`);
 
-  data.blurhash = await strapi.plugin(pluginName).service('blurhash').generateBlurhash(targetURL);
+  data.blurhash = await strapi
+    .plugin(pluginName)
+    .service('blurGenerator')
+    .generateBlurhash(targetURL);
   console.log(`blurhash generated successfully: ${data.blurhash}`);
 };
 

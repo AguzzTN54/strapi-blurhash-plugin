@@ -24,7 +24,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 const sharp = require("sharp");
 const _interopDefault = (e) => e && e.__esModule ? e : { default: e };
 const sharp__default = /* @__PURE__ */ _interopDefault(sharp);
-const pluginName = "strapi-blurhash-plugin";
+const pluginName = "blurhash";
 const generateURL = ({ url, host, port, hash, mime }) => {
   const isHttp = url.startsWith("http");
   const mainImgURL = isHttp ? url : `${"http://" + host + ":" + port}${url}`;
@@ -45,14 +45,14 @@ const beforeUpdateHandler = async (strapi, props) => {
     select: ["url", "blurhash", "name", "mime", "hash"],
     where
   });
-  const { mime, url, hash, name, blurhash: blurhash2 } = fullData || {};
+  const { mime, url, hash, name, blurhash } = fullData || {};
   console.log(`found existing file: ${name}`);
   const isImage = mime.startsWith("image/");
-  const isNeedUpdate = forceRegenerateOnUpdate || !blurhash2 && regenerateOnUpdate;
+  const isNeedUpdate = forceRegenerateOnUpdate || !blurhash && regenerateOnUpdate;
   if (!(isImage && isNeedUpdate)) return;
   const targetURL = generateURL({ hash, host, port, url, mime });
   console.log(`regenerating blurhash for image: ${targetURL}`);
-  data.blurhash = await strapi.plugin(pluginName).service("blurhash").generateBlurhash(targetURL);
+  data.blurhash = await strapi.plugin(pluginName).service("blurGenerator").generateBlurhash(targetURL);
   console.log(`blurhash regenerated successfully: ${data.blurhash}`);
 };
 const createHandler = async (strapi, props) => {
@@ -60,7 +60,7 @@ const createHandler = async (strapi, props) => {
   const { url, hash, mime } = data;
   const targetURL = generateURL({ hash, host, port, url, mime });
   console.log(`generating blurhash for image: ${targetURL}`);
-  data.blurhash = await strapi.plugin(pluginName).service("blurhash").generateBlurhash(targetURL);
+  data.blurhash = await strapi.plugin(pluginName).service("blurGenerator").generateBlurhash(targetURL);
   console.log(`blurhash generated successfully: ${data.blurhash}`);
 };
 const blurhashHandler = async (strapi, event, cycleType) => {
@@ -85,9 +85,7 @@ const bootstrap = ({ strapi }) => {
 const register = ({ strapi }) => {
   const fileData = strapi.plugin("upload").contentTypes.file;
   if (!fileData) return;
-  fileData.attributes.blurhash = {
-    type: "text"
-  };
+  fileData.attributes.blurhash = { type: "text" };
 };
 const config = {
   default: {
@@ -120,17 +118,17 @@ const encodeImageToBlurhash = async (url) => {
     const { width, height } = metadata || {};
     const Thumbhash = await import("thumbhash");
     const blurBuffer = Thumbhash.rgbaToThumbHash(width, height, Buffer.from(pixels));
-    const blurhash2 = Buffer.from(blurBuffer).toString("base64");
-    return blurhash2;
+    const blurhash = Buffer.from(blurBuffer).toString("base64");
+    return blurhash;
   } catch (error) {
     throw error;
   }
 };
-const blurhash = ({ strapi }) => ({
+const blurGenerator = ({ strapi }) => ({
   async generateBlurhash(url) {
     try {
-      const blurhash2 = await encodeImageToBlurhash(url);
-      return blurhash2;
+      const blurhash = await encodeImageToBlurhash(url);
+      return blurhash;
     } catch (error) {
       strapi.log.error(`Error generating blurhash: ${error.message}`);
       throw error;
@@ -138,7 +136,7 @@ const blurhash = ({ strapi }) => ({
   }
 });
 const services = {
-  blurhash
+  blurGenerator
 };
 const index = {
   register,

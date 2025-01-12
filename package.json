@@ -1,7 +1,7 @@
 {
   "name": "@aguzztn54/strapi-blurhash-plugin",
   "version": "0.1.0",
-  "description": "A Strapi Plugin to generate blurhash for each uploaded images",
+  "description": "Automatically generates Blurhash placeholders for uploaded images in Strapi CMS",
   "keywords": [
     "strapi",
     "plugin",
@@ -48,10 +48,10 @@
     "sharp": "^0.33.5"
   },
   "strapi": {
-    "name": "strapi-blurhash-plugin",
-    "description": "A Strapi Plugin to generate blurhash for each uploaded images",
+    "name": "blurhash",
+    "description": "Automatically generates Blurhash placeholders for uploaded images in Strapi CMS.",
     "kind": "plugin",
-    "displayName": "Strapi Thumbhash"
+    "displayName": "Blurhash Generator for Strapi"
   },
   "license": "MIT",
   "repository": {

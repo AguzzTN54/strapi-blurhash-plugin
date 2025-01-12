@@ -36,7 +36,7 @@ const encodeImageToBlurhash = async (url: URL | RequestInfo): Promise<string> =>
   }
 };
 
-const blurhash = ({ strapi }: { strapi: Core.Strapi }) => ({
+const blurGenerator = ({ strapi }: { strapi: Core.Strapi }) => ({
   async generateBlurhash(url: string) {
     try {
       const blurhash = await encodeImageToBlurhash(url);
@@ -48,4 +48,4 @@ const blurhash = ({ strapi }: { strapi: Core.Strapi }) => ({
   },
 });
 
-export default blurhash;
+export default blurGenerator;

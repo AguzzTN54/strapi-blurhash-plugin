@@ -1,5 +1,5 @@
-import blurhash from './blurhash';
+import blurGenerator from './blurGenerator';
 
 export default {
-  blurhash,
+  blurGenerator,
 };
