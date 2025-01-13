@@ -5,7 +5,7 @@ export default {
     regenerateOnUpdate: false,
     forceRegenerateOnUpdate: false,
     flatten: false,
-    flattenColor: null,
+    flattenColor: 'white',
   },
   validator: (config: Config) => {
     const { flatten, flattenColor: bg, forceRegenerateOnUpdate, regenerateOnUpdate } = config || {};
@@ -21,30 +21,15 @@ export default {
 
     if (flatten && bg) {
       if (typeof bg === 'object') {
-        if (!('r' in bg && 'g' in bg && 'b' in bg)) {
-          throw new Error("flattenColor should has 'r', 'g', & 'b' attributes");
-        }
-        if (typeof bg.r !== 'number' || typeof bg.g !== 'number' || typeof bg.b !== 'number') {
+        const bgValTypes = [];
+        Object.keys(bg).forEach((k) => bgValTypes.push(typeof bg[k] === 'number'));
+        if (bgValTypes.includes(false)) {
           throw new Error('flattenColor attributes should be number');
-        }
-
-        if (
-          bg.r > 255 ||
-          bg.g > 255 ||
-          bg.b > 255 ||
-          bg.r < 0 ||
-          bg.g < 0 ||
-          bg.b < 0 ||
-          !Number.isInteger(bg.r) ||
-          !Number.isInteger(bg.g) ||
-          !Number.isInteger(bg.b)
-        ) {
-          throw new Error('flattenColor attributes should be integer between 0 - 255');
         }
       }
 
       if (!((typeof bg).match(/(string|object|undefined)/) || bg === null)) {
-        throw new Error('flattenColor not a valid HEX or RGB Format');
+        throw new Error('flattenColor not a valid Color Format');
       }
     }
   },

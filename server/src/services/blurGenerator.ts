@@ -1,16 +1,16 @@
 import type { Core } from '@strapi/strapi';
 import type { RequestInfo } from 'node-fetch';
 import sharp from 'sharp';
-import type { Config, RGBColor } from '../types';
+import type { Config, ColorConfig } from '../types';
 
 interface FlattenOption {
-  background: RGBColor | string;
+  background: ColorConfig | string;
 }
-export const getColor = (color: RGBColor | string | null | undefined): FlattenOption => {
-  if (typeof color === 'undefined' || color === null) {
-    return { background: 'white' };
+export const getColor = (color: ColorConfig | string | null | undefined): FlattenOption => {
+  if (color && (typeof color === 'object' || typeof color === 'string')) {
+    return { background: color };
   }
-  return { background: color };
+  return { background: 'white' };
 };
 
 interface SharpProccessorProps {
