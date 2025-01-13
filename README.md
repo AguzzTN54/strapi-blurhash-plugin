@@ -4,7 +4,7 @@ Automatically generates Blurhash placeholders for uploaded images in [Strapi CMS
 
 ## Requirement
 
-Strapi v5≤
+Strapi >=5.0
 
 ## Features
 
@@ -16,19 +16,19 @@ This plugin is inspired by and is a soft copy of [Strapi Blurhash](https://githu
 
 ## Installation
 
-### Install my-project with npm
+### Install with npm
 
 ```bash
   npm install @aguzztn54/strapi-blurhash-plugin
 ```
 
-### Install my-project with yarn
+### Install with yarn
 
 ```bash
   yarn add @aguzztn54/strapi-blurhash-plugin
 ```
 
-### Install my-project with pnpm
+### Install with pnpm
 
 ```bash
   pnpm install @aguzztn54/strapi-blurhash-plugin
