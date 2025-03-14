@@ -53,6 +53,8 @@ const beforeUpdateHandler = async (strapi: Core.Strapi, props: HandlerProps) => 
     .plugin(pluginName)
     .service('blurGenerator')
     .generateBlurhash(targetURL, opt);
+
+  if (!data.blurhash) return;
   console.log(`blurhash regenerated successfully: ${data.blurhash}`);
 };
 
@@ -72,6 +74,8 @@ const createHandler = async (strapi: Core.Strapi, props: HandlerProps) => {
     .plugin(pluginName)
     .service('blurGenerator')
     .generateBlurhash(targetURL, opt);
+
+  if (!data.blurhash) return;
   console.log(`blurhash generated successfully: ${data.blurhash}`);
 };
 

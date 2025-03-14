@@ -1,12 +1,11 @@
 import type { Core } from '@strapi/strapi';
-import type { RequestInfo } from 'node-fetch';
 import sharp from 'sharp';
 import type { Config, ColorConfig } from '../types';
 
 interface FlattenOption {
   background: ColorConfig | string;
 }
-export const getColor = (color: ColorConfig | string | null | undefined): FlattenOption => {
+export const getColor = (color?: ColorConfig | string | null): FlattenOption => {
   if (color && (typeof color === 'object' || typeof color === 'string')) {
     return { background: color };
   }
@@ -15,7 +14,7 @@ export const getColor = (color: ColorConfig | string | null | undefined): Flatte
 
 interface SharpProccessorProps {
   metadata: { width: number; height: number };
-  pixels: ArrayBuffer;
+  pixels: Buffer;
 }
 
 const sharpProccessor = async (
@@ -36,7 +35,7 @@ const sharpProccessor = async (
   }
 };
 
-const encodeImageToBlurhash = async (url: URL | RequestInfo, opt: Config): Promise<string> => {
+const encodeImageToBlurhash = async (url: URL | string, opt: Config): Promise<string> => {
   try {
     const fetch = (await import('node-fetch')).default;
     const response = await fetch(url);
@@ -65,7 +64,7 @@ const blurGenerator = ({ strapi }: { strapi: Core.Strapi }) => ({
       return blurhash;
     } catch (error) {
       strapi.log.error(`Error generating blurhash: ${error.message}`);
-      throw error;
+      return '';
     }
   },
 });
