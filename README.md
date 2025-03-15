@@ -4,7 +4,7 @@ Automatically generates Blurhash placeholders for uploaded images in [Strapi CMS
 
 ## Requirement
 
-Strapi v5≤
+Strapi v5 or newer
 
 ## Features
 
@@ -16,19 +16,19 @@ This plugin is inspired by and is a soft copy of [Strapi Blurhash](https://githu
 
 ## Installation
 
-### Install my-project with npm
+### Install with npm
 
 ```bash
   npm install @aguzztn54/strapi-blurhash-plugin
 ```
 
-### Install my-project with yarn
+### Install with yarn
 
 ```bash
   yarn add @aguzztn54/strapi-blurhash-plugin
 ```
 
-### Install my-project with pnpm
+### Install with pnpm
 
 ```bash
   pnpm install @aguzztn54/strapi-blurhash-plugin
@@ -36,10 +36,16 @@ This plugin is inspired by and is a soft copy of [Strapi Blurhash](https://githu
 
 ## Configurations
 
-This is an example configuration on file `config/plugins.js`
+This is an example configuration on file `config/plugins.ts` or `config/plugins.js`
 
 ```js
-module.exports = ({ env }) => ({
+// config/plugins.ts
+import type { BlurhashConfig } from '@aguzztn54/strapi-blurhash-plugin/dist/server/types';
+
+interface PluginConfig extends BlurhashConfig {
+  [key: string]: any;
+}
+export default ({ env }): PluginConfig => ({
   blurhash: {
     enabled: true,
     config: {
@@ -53,12 +59,13 @@ module.exports = ({ env }) => ({
       },
     },
   },
+  // ... another Plugin
 });
 ```
 
 | Properties                |       Types        | Default Value | Description                                                                                                                                                        |
 | ------------------------- | :----------------: | :-----------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `regenerateOnUpdate`      |     `boolean`      |    `false`    | Regenerate Blurhash after updating media                                                                                                                           |
+| `regenerateOnUpdate`      |     `boolean`      |    `false`    | Regenerate Blurhash when media is updated. If the media is replaced or cropped, this plugin will continue generating a new Blurhash string                         |
 | `forceRegenerateOnUpdate` |     `boolean`      |    `false`    | If `false`, the blurhash will only be generated if it is currently missing                                                                                         |
 | `flatten`                 |     `boolean`      |    `false`    | Remove Transparency and fill with color                                                                                                                            |
 | `flattenColor`            | `object \| string` |    `white`    | Background color string or object, parsed by the [Color](https://github.com/Qix-/color?tab=readme-ov-file#constructors) Module, if unset, default color is `black` |
@@ -74,32 +81,16 @@ The `blurhash` attribute will automatically appear when you populate your API en
       "id": 18,
       "documentId": "byxz57csj2ndeso36dp7gsf5",
       "title": "Ngantroe Park",
-      "description": null,
-      "createdAt": "2024-12-28T09:15:24.410Z",
-      "updatedAt": "2025-01-13T11:05:12.910Z",
-      "publishedAt": "2025-01-13T11:05:12.935Z",
-      "locale": "id",
       "gallery": [
         {
           "id": 95,
           "documentId": "f8u5xd6a9bjt4khd0pzmmke3",
           "name": "f1-good-37eadc74.avif",
-          "alternativeText": null,
-          "caption": null,
-          "width": null,
-          "height": null,
-          "formats": null,
           "hash": "f1_good_37eadc74_00f9a877f9",
           "ext": ".avif",
           "mime": "image/avif",
           "size": 18.18,
           "url": "/uploads/f1_good_37eadc74_00f9a877f9.avif",
-          "previewUrl": null,
-          "provider": "local",
-          "provider_metadata": null,
-          "createdAt": "2025-01-13T11:04:56.990Z",
-          "updatedAt": "2025-01-13T11:04:56.990Z",
-          "publishedAt": "2025-01-13T11:04:57.182Z",
           "blurhash": "GBgGDIR/iGdVqGeGYcWfJvoFVw=="
         }
       ]
@@ -127,3 +118,23 @@ const base64URL = Thumbhash.thumbHashToDataURL(arrayBuffer);
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
+
+## Changelog
+
+#### [0.1.2] - 15 Mar 2025
+
+**Major Changes**
+
+- Use the same `Sharp` version as Strapi
+- Now, Blurhash is generated in the middleware before the media is uploaded to the storage server. However, updating the Blurhash still fetches the image from the Storage Server and may fail depending on your Storage Server configuration.
+- Use the same `Axios` package as Strapi instead of `node-fetch` to fetch images when regenerating Blurhash, eliminating the need for additional dependencies.
+- Optimizing Dependencies
+
+#### [0.1.1] - 13 Jan 2025
+
+- Transparent or Flatten Blurhash Support
+
+#### [0.1.0] - 12 Jan 2025
+
+- Initial Relase
+- Various mimetype support
