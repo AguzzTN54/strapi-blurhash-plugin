@@ -1,5 +1,16 @@
 import type { Config } from '../types';
 
+export const PLUGIN_NAME = 'blurhash';
+export const SUPPORTED_MIMES = [
+  'image/png',
+  'image/jpeg',
+  'image/jpg',
+  'image/avif',
+  'image/webp',
+  'image/svg',
+  'image/gif',
+];
+
 export default {
   default: {
     regenerateOnUpdate: false,
