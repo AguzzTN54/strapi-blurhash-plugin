@@ -1,6 +1,6 @@
 {
   "name": "@aguzztn54/strapi-blurhash-plugin",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Automatically generates Blurhash placeholders for uploaded images in Strapi CMS",
   "keywords": [
     "strapi",

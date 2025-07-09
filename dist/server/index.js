@@ -195,4 +195,3 @@ const index = {
   config
 };
 module.exports = index;
-//# sourceMappingURL=index.js.map

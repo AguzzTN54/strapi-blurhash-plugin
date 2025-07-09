@@ -121,6 +121,10 @@ const base64URL = Thumbhash.thumbHashToDataURL(arrayBuffer);
 
 ## Changelog
 
+#### [0.1.3] - 09 Jul 2025
+
+- Add Support for API Upload
+
 #### [0.1.2] - 15 Mar 2025
 
 **Major Changes**
