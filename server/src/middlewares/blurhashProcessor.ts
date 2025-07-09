@@ -120,10 +120,10 @@ const processUpdate = async (strapi: Core.Strapi, ctx) => {
 const blurhashProcessor = (strapi: Core.Strapi): Core.MiddlewareHandler => {
   return async (ctx, next) => {
     const { body, method, url, files } = ctx.request;
-    const isRequest = !!(body && method === 'POST' && body.fileInfo);
+    const isRequest = !!(body && method === 'POST' && (body.fileInfo || files));
     try {
-      const isNewUpload = url === '/upload' && files && isRequest;
-      const isUpdateMedia = url.startsWith('/upload?id=') && isRequest;
+      const isNewUpload = (url === '/upload' || url === '/api/upload') && files && isRequest;
+      const isUpdateMedia = (url.startsWith('/upload?id=') || url.startsWith('/api/upload?id=')) && isRequest;
       if (isNewUpload) await processUpload(strapi, ctx);
       else if (isUpdateMedia) await processUpdate(strapi, ctx);
     } catch (e) {
